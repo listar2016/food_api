@@ -1,0 +1,48 @@
+type Client {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  status: String
+  telephone_number: String!
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+extend type Mutation {
+  createClient(
+    first_name: String @rules(apply: ["required", "string"])
+    last_name: String @rules(apply: ["required", "string"])
+    email: String @rules(apply: ["required", "email", "unique:client,email"])
+    status: String @rules(apply: ["string", "in:active,inActive,suspended"])
+    telephone_number: String @rules(apply: ["nullable", "string"])
+  ): [Client!]! @field(resolver: "Admin\\Customers\\CreateClient@resolve")
+
+  saveClient(
+    id: String @rules(apply: ["required", "string", "exists:client,id"])
+    first_name: String @rules(apply: ["nullable", "string"])
+    last_name: String @rules(apply: ["nullable", "string"])
+    email: String @rules(apply: ["nullable", "email", "unique:client,email"])
+    status: String @rules(apply: ["string", "in:active,inActive,suspended"])
+    telephone_number: String @rules(apply: ["nullable", "string"])
+  ): [Client!]! @field(resolver: "Admin\\Customers\\SaveClient@resolve")
+
+  changeClientStatus(
+    id: String @rules(apply: ["required", "string", "exists:client,id"])
+    status: String @rules(apply: ["string", "in:active,inActive,suspended"])
+  ): [Client!]! @field(resolver: "Admin\\Customers\\ChangeClientStatus@resolve")
+
+  deleteClient(
+    id: String @rules(apply: ["required", "string", "exists:client,id"])
+  ): [Client!]! @field(resolver: "Admin\\Customers\\DeleteClient@resolve")
+}
+
+extend type Query {
+  clients: [Client!]! @all
+  client(
+    id: String @rules(apply: ["required", "string", "exists:client,id"])
+  ): Client! @first
+  searchClients(
+    search: String @rules(apply: ["nullable", "string"]) @search
+  ): [Client!]! @paginate
+}

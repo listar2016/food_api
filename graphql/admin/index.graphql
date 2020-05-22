@@ -1,0 +1,10 @@
+
+#import ./create-shop.graphql
+
+#import ./customers/client.graphql
+
+#import ./settings/admin.graphql
+#import ./settings/settings_commission.graphql
+
+#import ./shop-extra/shop_service.graphql
+#import ./shop-extra/shop_kitchen.graphql

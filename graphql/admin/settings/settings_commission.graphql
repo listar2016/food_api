@@ -1,0 +1,38 @@
+type SettingsCommission {
+  id: ID!
+  display: String!
+  uniq_slug: String!
+  percentage: Float!
+  fixed: Float!
+  monthly: Float!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+extend type Mutation @middleware(checks: ["auth:admin"]) {
+  createCommission(
+    display: String @rules(apply: ["required", "string"])
+    percentage: Float @rules(apply: ["required", "integer", "between:0,100"])
+    fixed: Float @rules(apply: ["required", "between:0,99999999.99"])
+    monthly: Float @rules(apply: ["required", "between:0,99999999.99"])
+  ): [SettingsCommission!]! @field(resolver: "Admin\\Settings\\CreateSettingsCommission@resolve")
+
+  saveCommission(
+    id: String @rules(apply: ["required", "string", "exists:settings_commission,id"])
+    display: String @rules(apply: ["required", "string"])
+    percentage: Float @rules(apply: ["required", "integer", "between:0,99"])
+    fixed: Float @rules(apply: ["required", "between:0,99999999.99"])
+    monthly: Float @rules(apply: ["required", "between:0,99999999.99"])
+  ): [SettingsCommission!]! @field(resolver: "Admin\\Settings\\SaveSettingsCommission@resolve")
+
+  deleteCommission(
+    id: String @rules(apply: ["required", "string", "exists:settings_commission,id"])
+  ): [SettingsCommission!]! @field(resolver: "Admin\\Settings\\DeleteSettingsCommission@resolve")
+}
+
+extend type Query {
+  settingsCommissions: [SettingsCommission!]! @all
+  settingsCommission(
+    id: String @rules(apply: ["required", "string", "exists:settings_commission,id"])
+  ): SettingsCommission! @find
+}

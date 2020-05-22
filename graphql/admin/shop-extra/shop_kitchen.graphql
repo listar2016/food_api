@@ -1,0 +1,32 @@
+type ShopKitchen {
+  id: ID!
+  display: String!
+  thumbnail: String
+  uniq_slug: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+extend type Mutation @middleware(checks: ["auth:admin"]) {
+  createKitchen(
+    display: String @rules(apply: ["required", "string"])
+    thumbnail: String @rules(apply: ["nullable", "string"])
+  ): [ShopKitchen!]! @field(resolver: "Admin\\ShopExtra\\CreateShopKitchen@resolve")
+
+  saveKitchen(
+    id: String @rules(apply: ["required", "string", "exists:shop_kitchen,id"])
+    display: String @rules(apply: ["required", "string"])
+    thumbnail: String @rules(apply: ["nullable", "string"])
+  ): [ShopKitchen!]! @field(resolver: "Admin\\ShopExtra\\SaveShopKitchen@resolve")
+
+  deleteKitchen(
+    id: String @rules(apply: ["required", "string", "exists:shop_kitchen,id"])
+  ): [ShopKitchen!]! @field(resolver: "Admin\\ShopExtra\\DeleteShopKitchen@resolve")
+}
+
+extend type Query {
+  shopKitchens: [ShopKitchen!]! @all
+  shopKitchen(
+    id: String @rules(apply: ["required", "string", "exists:shop_kitchen,id"])
+  ): ShopKitchen! @find
+}

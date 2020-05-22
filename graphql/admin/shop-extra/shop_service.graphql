@@ -1,0 +1,32 @@
+type ShopService {
+  id: ID!
+  display: String!
+  thumbnail: String
+  uniq_slug: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+extend type Mutation @middleware(checks: ["auth:admin"]) {
+  createService(
+    display: String @rules(apply: ["required", "string"])
+    thumbnail: String @rules(apply: ["nullable", "string"])
+  ): [ShopService!]! @field(resolver: "Admin\\ShopExtra\\CreateShopService@resolve")
+
+  saveService(
+    id: String @rules(apply: ["required", "string", "exists:shop_service,id"])
+    display: String @rules(apply: ["required", "string"])
+    thumbnail: String @rules(apply: ["nullable", "string"])
+  ): [ShopService!]! @field(resolver: "Admin\\ShopExtra\\SaveShopService@resolve")
+
+  deleteService(
+    id: String @rules(apply: ["required", "string", "exists:shop_service,id"])
+  ): [ShopService!]! @field(resolver: "Admin\\ShopExtra\\DeleteShopService@resolve")
+}
+
+extend type Query {
+  shopServices: [ShopService!]! @all
+  shopService(
+    id: String @rules(apply: ["required", "string", "exists:shop_service,id"])
+  ): ShopService! @find
+}

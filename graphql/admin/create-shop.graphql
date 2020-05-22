@@ -1,0 +1,54 @@
+type Shop {
+  id: ID!
+  name: String!
+  location: String!
+  email: String!
+  status: String
+  telephone_number: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+extend type Mutation {
+  createShopFindClient(
+    id: String @rules(apply: ["required", "string", "exists:client,id"])
+  ): Boolean! @field(resolver: "Admin\\AddShop\\FindClient@resolve")
+
+  createShopBasicData(
+    shopType: String @rules(apply: ["required", "in:delivery,restaurants,partyServices,dinner"])
+    shopName: String @rules(apply: ["required", "string"])
+    shopLogo: String @rules(apply: ["required", "string"])
+    shopMetaDescription: String @rules(apply: ["required", "string"])
+    shopKitchenFields: [ID] @rules(apply: ["required", "exists:shop_kitchen,id"])
+    shopReservedFoodType: [String] @rules(apply: ["required", "string"])
+    shopServicesFields: [ID] @rules(apply: ["required", "exists:shop_service,id"])
+  ): Boolean! @field(resolver: "Admin\\AddShop\\BasicData@resolve")
+
+  createShopSetUp(
+    shopCommission: String @rules(apply: ["required", "in:free,percentage,fix,monthly"])
+    shopPaymentType: String @rules(apply: ["required", "in:all,selected"])
+    shopOrderTransfar: [String] @rules(apply: ["required", "string"])
+    shopPaymentMethod: [String] @rules(apply: ["required", "in:cash,paypal,giroPay,billpay"])
+    shopDeliveryOptions: [String] @rules(apply: ["required", "in:pickUp,delivery,tip"])
+    shopDeliveryCost: Float @rules(apply: ["required", "between:0,99999999.99"])
+    shopMiniOderCost: Float @rules(apply: ["required", "between:0,99999999.99"])
+    shopCharge: Float @rules(apply: ["required", "between:0,99999999.99"])
+    shopPayoutSchedule: String @rules(apply: ["required", "in:daily,weekly,monthly"])
+    shopPayoutType: String @rules(apply: ["required", "in:paypal,bankAccoutn"])
+  ): Client @field(resolver: "Admin\\AddShop\\ShopDetail@resolve")
+
+
+  createShopSetUps(
+    shopCommission: String @rules(apply: ["required", "in:free,percentage,fix,monthly"])
+    shopPaymentType: String @rules(apply: ["required", "in:all,selected"])
+    shopOrderTransfar: [String] @rules(apply: ["required", "string"])
+    shopPaymentMethod: [String] @rules(apply: ["required", "in:cash,paypal,giroPay,billpay"])
+    shopDeliveryOptions: [String] @rules(apply: ["required", "in:pickUp,delivery,tip"])
+    shopDeliveryCost: Float @rules(apply: ["required", "between:0,99999999.99"])
+    shopMiniOderCost: Float @rules(apply: ["required", "between:0,99999999.99"])
+    shopCharge: Float @rules(apply: ["required", "between:0,99999999.99"])
+    shopPayoutSchedule: String @rules(apply: ["required", "in:daily,weekly,monthly"])
+    shopPayoutType: String @rules(apply: ["required", "in:paypal,bankAccoutn"])
+  ): Client @field(resolver: "Admin\\AddShop\\ShopDetail@resolve")
+
+}

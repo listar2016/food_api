@@ -1,0 +1,63 @@
+type User @middleware(checks: ["auth:api"]) {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  gender: String!
+  telephone_number: String!
+  street: String!
+  street_number: String!
+  floor: Int
+  zip_code: String
+  direction: String
+  room_number: Int
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+type CreatedUser {
+  id: ID!
+  email: String!
+  first_name: String!
+  last_name: String!
+}
+
+extend type Mutation {
+  createUser(
+    first_name: String @rules(apply: ["required", "string"])
+    last_name: String @rules(apply: ["required", "string"])
+    email: String @rules(apply: ["required", "email", "unique:user,email"])
+    password: String @rules(apply: ["required", "min:6", "string"])
+    gender: String @rules(apply: ["required", "string"])
+    telephone_number: String @rules(apply: ["required", "string"])
+    street: String @rules(apply: ["required", "string"])
+    street_number: String @rules(apply: ["required", "string"])
+    floor: String @rules(apply: ["nullable", "string"])
+    zip_code: String @rules(apply: ["nullable", "string"])
+    direction: String @rules(apply: ["nullable", "string"])
+    room_number: String @rules(apply: ["nullable", "string"])
+  ): CreatedUser! @field(resolver: "User\\Settings\\CreateUser@resolve")
+
+  saveUser(
+    id: String @rules(apply: ["required", "string", "exists:user,id"])
+    first_name: String @rules(apply: ["nullable", "string"])
+    last_name: String @rules(apply: ["nullable", "string"])
+    email: String @rules(apply: ["required", "email", "unique:user,email"])
+    password: String @rules(apply: ["required", "string", "min:6"])
+    gender: String @rules(apply: ["nullable", "string"])
+    telephone_number: String @rules(apply: ["nullable", "string"])
+    street: String @rules(apply: ["nullable", "string"])
+    street_number: String @rules(apply: ["nullable", "string"])
+    floor: String @rules(apply: ["nullable", "string"])
+    zip_code: String @rules(apply: ["nullable", "string"])
+    direction: String @rules(apply: ["nullable", "string"])
+    room_number: String @rules(apply: ["nullable", "string"])
+  ): CreatedUser! @field(resolver: "User\\Settings\\SaveUser@resolve")
+
+}
+
+extend type Query {
+  users: [User!]! @all
+  user(
+    id: String @rules(apply: ["required", "string", "exists:admin,id"])
+  ): User! @find
+}

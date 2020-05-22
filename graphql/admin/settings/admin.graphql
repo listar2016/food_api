@@ -1,0 +1,45 @@
+type Admin @middleware(checks: ["auth:admin"]) {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  services: String
+  image: String
+  telephone_number: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+extend type Mutation {
+  createAdmin(
+    first_name: String @rules(apply: ["required", "string"])
+    last_name: String @rules(apply: ["required", "string"])
+    email: String @rules(apply: ["required", "email", "unique:admin,email"])
+    services: String @rules(apply: ["nullable", "string"])
+    image: String @rules(apply: ["nullable", "string"])
+    telephone_number: String @rules(apply: ["nullable", "string"])
+    password: String @rules(apply: ["required", "min:6", "string"])
+  ): [Admin!]! @field(resolver: "Admin\\Settings\\CreateAdmin@resolve")
+
+  saveAdmin(
+    id: String @rules(apply: ["required", "string", "exists:admin,id"])
+    first_name: String @rules(apply: ["nullable", "string"])
+    last_name: String @rules(apply: ["nullable", "string"])
+    email: String @rules(apply: ["nullable", "email", "unique:admin,email"])
+    services: String @rules(apply: ["nullable", "string"])
+    image: String @rules(apply: ["nullable", "string"])
+    telephone_number: String @rules(apply: ["nullable", "string"])
+    password: String @rules(apply: ["nullable", "min:6", "string"])
+  ): [Admin!]! @field(resolver: "Admin\\Settings\\SaveAdmin@resolve")
+
+  deleteAdmin(
+    id: String @rules(apply: ["required", "string", "exists:admin,id"])
+  ): [Admin!]! @field(resolver: "Admin\\Settings\\DeleteAdmin@resolve")
+}
+
+extend type Query {
+  admins: [Admin!]! @all
+  admin(
+    id: String @rules(apply: ["required", "string", "exists:admin,id"])
+  ): Admin! @find
+}
